@@ -1,6 +1,13 @@
 """공유 pytest 픽스처 — 테스트 데이터만 (도메인 로직 없음)."""
 
+import sys
+from pathlib import Path
+
 import pytest
+
+_tests_root = Path(__file__).resolve().parent
+if str(_tests_root) not in sys.path:
+    sys.path.insert(0, str(_tests_root))
 
 
 @pytest.fixture
@@ -27,10 +34,10 @@ def grid_complete_magic():
 
 @pytest.fixture
 def grid_d1_only_fail():
-    """행·열 합 34, D1(주대각선)만 ≠ 34 — AC-1 / Mom Test."""
+    """행·열 합 34, 대각선(D1·D2) ≠ 34 — AC-1 (D1+D2=68 불변)."""
     return [
-        [16, 2, 3, 13],
-        [5, 11, 10, 8],
-        [9, 7, 6, 12],
-        [4, 14, 15, 1],
+        [16, 3, 2, 13],
+        [5, 11, 11, 7],
+        [9, 5, 7, 13],
+        [4, 15, 14, 1],
     ]

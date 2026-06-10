@@ -1,0 +1,7 @@
+"""MagicConstant SSOT — 리터럴 34/16/4/0 산재 금지."""
+
+GRID_SIZE = 4
+MAGIC_SUM = 34
+CELL_MAX = 16
+BLANK_CELL = 0
+EXPECTED_BLANK_COUNT = 2
