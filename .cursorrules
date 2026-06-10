@@ -1,0 +1,50 @@
+# MagicSquare_xx — Cursor Rules (Session 3+)
+
+## 프로젝트 목적
+4×4 부분 마방진에서 10선(행·열·대각선) 합 34 판정. Solver·UI·자동 채우기는 범위 밖.
+
+## 도메인 (Rule)
+- 격자: 4×4, 각 칸은 `0`(빈칸) 또는 `1~16`
+- 마법상수: **34**
+- 10선 ID: **R1~R4**(행), **C1~C4**(열), **D1·D2**(대각선) — 10선 누락 금지
+- `0`이 포함된 줄: 합산·판정 정책을 테스트와 구현에서 일관되게 적용
+- 완성 격자: 1~16 중복 없음 (세션 범위는 10선 판정 우선)
+
+## API (Boundary)
+```python
+validate_lines(grid) -> {"status": "pass"|"fail"|"incomplete", "failed_lines": [...]}
+```
+- `grid`: 4×4 정수 리스트(또는 동등 구조)
+- `status`: `pass`(10선 모두 34), `fail`(한 줄이라도 ≠34), `incomplete`(빈칸 등 미완)
+- `failed_lines`: 34가 아닌 줄 ID 목록 (예: `["D1"]`). pass/incomplete 시 빈 리스트
+
+## ECB 구조
+| 계층 | 역할 | 예시 |
+|------|------|------|
+| **Entity** | 격자·줄·마법상수 등 도메인 데이터 | 4×4 grid, line ID, MAGIC=34 |
+| **Control** | 판정 흐름·10선 순회·결과 조합 | `validate_lines`, 줄 추출·합산 조율 |
+| **Boundary** | 입출력 형식·외부 계약 | grid 입력, `{status, failed_lines}` 반환 |
+
+- Entity에 I/O 형식 섞지 않음. Control이 Entity를 조합해 Boundary 계약을 만족.
+- 세션 3: Control·Entity 최소 구현. GridUI·Solver·MissingFinder는 Boundary 확장 금지.
+
+## TDD (Test Loop)
+- 사이클: **RED → GREEN → REFACTOR** (한 번에 한 단계)
+- **RED**: `tests/`만 수정 — 실패하는 테스트 추가. `src/` 구현 금지
+- **GREEN**: 테스트 통과에 필요한 최소 코드만 `src/`에 추가
+- **REFACTOR**: 테스트 유지한 채 구조만 정리
+- 금지: assert 완화, `@pytest.mark.skip`, `xfail`, 테스트 삭제로 RED 회피
+- RED 검증: `pytest` 실행 시 새 테스트가 **실패**해야 함
+
+## 코드·파일 규칙
+- 구현: `src/` (예: `validate_lines.py`)
+- 테스트: `tests/` (예: `test_validate_lines.py`)
+- 의존성·pytest: `pyproject.toml`
+- 불필요한 추상화·ECB 과잉(Validator/Solver 네이밍) 금지
+
+## AI 응답 규칙
+- **한국어**로 답변
+- TDD 작업 시 응답 **첫 줄**에 Phase 선언: `Phase: RED` / `Phase: GREEN` / `Phase: REFACTOR`
+- 구현·테스트 본문은 요청·Phase에 맞을 때만 작성
+- **git commit은 사용자가 명시적으로 요청할 때만** 수행
+- Mom Test 진짜 문제(대각선 검산 누락·원인 확인 비용)와 무관한 기능 제안 금지
